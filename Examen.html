@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <h1>jQuery x Flickr</h1>
+    <input id="entreeRecherche" type="search" name="search"/>
+    <button id="b1">Recherche</button>
+    <div id="images"></div>
+</body>
+
+<!--
+    https://www.flickr.com/services/feeds/photos_public.gne?tags=brest
+-->
+
+<script>
+    $(document).ready(function (){
+        let motRecherche = $(":input");
+        $(b1).onclick(function(getImages){});
+
+        function getImages() {
+            $.getJSON("https://api.flickr.com/services/feeds/photos_public.gne?tags="+motRecherche+"&tagmode=any&format=json&jsoncallback=?",
+            function(data) {
+                $.each(data.items, function(i,item){
+                $("<img/>").attr("src", item.media.m).appendTo("#images");
+                if ( i == 11 ) return false;
+            });
+        });
+        }
+        
+    });
+</script>
+</html>

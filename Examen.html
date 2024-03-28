@@ -6,52 +6,127 @@
     <title>Page Title</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
     <style>
-        
+        #top{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .roboto-bold-italic {
+            font-family: "Roboto", sans-serif;
+            font-weight: 700;
+            font-style: italic;
+        }
+        .search{
+            padding-bottom: 2%;
+        }
+        .roboto-regular {
+            font-family: "Roboto", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        #images{
+            display: grid;
+            grid-template-columns: auto auto auto;
+            grid-template-rows: auto auto auto auto auto;
+            grid-column-gap: 20px;
+            grid-row-gap: 20px;
+            justify-items: stretch;
+            align-items: stretch;
+        }
+        @media (max-width: 760px){
+            #images{
+                display: grid;
+                grid-template-columns: auto auto;
+                grid-template-rows: auto auto auto auto auto;
+                grid-column-gap: 20px;
+                grid-row-gap: 20px;
+                justify-items: stretch;
+                align-items: stretch;
+            }
+        }
+        .card{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: solid 1px black;
+        }
+        #searchBuffer{
+            opacity: 0;
+        }
     </style>
 </head>
 <body>
-    <h1>jQuery x Flickr</h1>
-    <input id="entreeRecherche" type="search" name="search"/>
-    <button id="b1">Recherche</button>
+    <div id="top">
+        <h1 class="roboto-bold-italic">jQuery x Flickr</h1>
+        <div class="search">
+            <input id="entreeRecherche" type="search" name="search"/>
+            <button id="b1" class="roboto-regular">Recherche</button>
+        </div>
+    </div>
     <div id="images"></div>
     <p id="searchBuffer"></p>
-    <p id="keyBuffer"></p>
 </body>
 
 <script>
     $(document).ready(function (){
 
-        //Recherche d'image
-        function getImages() {
+        //Recherche d'image & titre
+        function getImages(){
             let motRecherche = $("#searchBuffer").html();
             $.getJSON("https://api.flickr.com/services/feeds/photos_public.gne?tags="+motRecherche+"&tagmode=any&format=json&jsoncallback=?",
             function(data) {
                 $.each(data.items, function(i,item){
-                $("<img/>").attr("src", item.media.m).appendTo("#images");
-                if ( i == 11 ) return false;
+                    $("<img/>").attr("src", item.media.m).appendTo("#card"+i);
+                    $("<p>").text(item.title).appendTo("#card"+i)
+                    if ( i == 11 ) return false;
                 });
             });
         };
 
+        //Création des cartes pour les images
+        function createCards(){
+            for(let i = 0; i < 12; i++){
+                $("<div>").attr({
+                    id: "card"+i,
+                    class: "card"
+                }).appendTo("#images");
+            };
+        };
+
+        //Suppression des anciennes recherches
+        function deleteCards(){
+            $(".card").remove();
+        };
+
         //Met le terme recherché dans #searchBuffer
-        $("#entreeRecherche").keyup(function() {
+        $("#entreeRecherche").keyup(function(){
             let recherche = $(this).val();
             $("#searchBuffer").text(recherche);
         });
 
+        //Lance #b1 à la touche entrée
+        $("#entreeRecherche").keypress(function(event){
+            if (event.which == 13){  
+                $("#b1").trigger("click");
+            };
+        });
+
         //Lance la recherche d'image au click du bouton
         $("#b1").click(function(){
+            deleteCards();
+            createCards();
             getImages();
         });
 
-        //Met la dernière touche appuyé dans keyBuffer
-        $("#entreeRecherche").keypress(function(event){
-            $("#keyBuffer").text(event.which);
+        //Animation au click de l'image
+        $("img").click(function(){
+            $(this).animate({width:"50svh"},1000);
         })
 
-        //Vérifie la dernière touche pressée dans l'input
-        
     });
 </script>
 </html>
